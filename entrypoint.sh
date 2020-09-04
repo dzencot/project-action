@@ -2,7 +2,7 @@
 
 mkdir -p /tmp/builds/source
 
-docker run -v /tmp/builds:/mnt $1:release bash -c 'cp -r /project/* /mnt/source && rm -rf /mnt/source/code'
+docker run -v "/tmp/builds:/mnt" $1:release bash -c 'cp -r /project/* /mnt/source && rm -rf /mnt/source/code'
 
 mkdir -p /tmp/builds/source/code
 cp -r `pwd`/* /tmp/builds/source/code
