@@ -1,4 +1,4 @@
-FROM docker/compose:alpine-1.27.0-rc3
+FROM docker/compose:debian-1.27.0-rc3
 
 COPY entrypoint.sh /entrypoint.sh
 
