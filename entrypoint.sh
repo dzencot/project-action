@@ -2,10 +2,11 @@
 
 mkdir -p /tmp/builds/source
 
-ls -la  /tmp/builds
-
 docker run -v "/tmp/builds/source:/tmp/builds/source" $1:release bash -c 'cp -r /project/* /tmp/builds/source && rm -rf /tmp/builds/source/code'
 
 mkdir -p /tmp/builds/source/code
 cp -r $(pwd)/* /tmp/builds/source/code
+
+ls -la /tmp/builds/source
+
 cd /tmp/builds/source && docker-compose run development make setup test lint
