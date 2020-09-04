@@ -9,4 +9,6 @@ cp -r $(pwd)/* /tmp/builds/source/code
 
 ls -la /tmp/builds/source
 
+ls -la $(pwd)
+
 cd /tmp/builds/source && docker-compose run development make setup test lint
