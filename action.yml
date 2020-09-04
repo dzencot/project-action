@@ -1,7 +1,7 @@
-name: 'Project action'
+name: 'Hexlet project action'
 description: 'For testing projects'
 inputs:
-  project-docker-image:
+  project_image:
     description: 'Docker image from original project repository.'
     required: true
 outputs:
@@ -11,5 +11,5 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.project-docker-image }}
+    - ${{ inputs.project_image }}
 
