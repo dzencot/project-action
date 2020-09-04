@@ -1,0 +1,15 @@
+name: 'Project action'
+description: 'For testing projects'
+inputs:
+  project-docker-image:
+    description: 'Docker image from original project repository.'
+    required: true
+outputs:
+  time:
+    description: 'The time we greeted you'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.project-docker-image }}
+
