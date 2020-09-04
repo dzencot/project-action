@@ -2,9 +2,13 @@
 
 mkdir -p /tmp/builds/source
 
+echo "ls -la /project"
+
 docker run -v "/tmp/builds/source:/tmp/builds/source" $1:release bash -c 'ls -la /project'
+echo "ls -la ls -la /tmp/builds/source"
 docker run -v "/tmp/builds/source:/tmp/builds/source" $1:release bash -c 'cp -r /project/* /tmp/builds/source && ls -la /tmp/builds/source && rm -rf /tmp/builds/source/code'
 
+echo "ls -la /tmp/builds/source"
 ls -la /tmp/builds/source
 
 mkdir -p /tmp/builds/source/code
