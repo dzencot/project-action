@@ -1,5 +1,5 @@
 #!/bin/sh -l
-export BUILD_DIRECTORY $(pwd)/build
+export BUILD_DIRECTORY=$(pwd)/build
 
 mkdir $BUILD_DIRECTORY
 
