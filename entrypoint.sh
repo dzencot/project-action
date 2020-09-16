@@ -3,7 +3,7 @@
 echo "mkdir"
 mkdir -p /tmp/builds/source
 
-echo "ls -la /project/*"
+echo "ls -la /project/"
 
 docker run --name project  $1:release bash -c 'ls -la /project/'
 echo "docker cp"
