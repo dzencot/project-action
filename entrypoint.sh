@@ -6,7 +6,7 @@ mkdir -p /tmp/builds/source
 echo $GITHUB_WORKSPACE
 echo "$(ls -la $GITHUB_WORKSPACE)"
 
-docker run -n project  $1:release bash -c 'ls -la /project/*'
+docker run --name project  $1:release bash -c 'ls -la /project/*'
 docker cp  project:/project/* .
 
 ls -la $(pwd)
