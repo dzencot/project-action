@@ -15,6 +15,6 @@ cd /tmp/project && docker-compose run development cat Makefile
 cd /tmp/project && docker-compose run development ls -la /project
 
 docker ps -a
-docker inspect project_development_run_1
+docker inspect $(docker ps -a | grep 'project_development' | awk '{print $1}')
 
 # cd /tmp/project && docker-compose run development make setup test lint
