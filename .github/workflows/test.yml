@@ -5,6 +5,11 @@ on:
     branches:
       - master
 
+env:
+  MOUNT_POINT: /tmp/builds
+  PROJECT_IMAGE: registry.gitlab.com/hexlethq/boilerplates/php_example_project
+
+
 jobs:
   test:
     runs-on: ubuntu-latest
