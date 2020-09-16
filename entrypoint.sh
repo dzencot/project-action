@@ -5,6 +5,8 @@ docker cp  project-source:/project /tmp
 
 rm -rf /tmp/project/code/*
 
+ls -la $(pwd)
+
 cp -r $(pwd)/* /tmp/project/code/
 
 cat /tmp/project/Makefile
