@@ -10,7 +10,7 @@ echo "docker cp"
 docker cp  project:/project/ /tmp/builds/source
 
 echo "ls -la tmp"
-ls -la /tmp/builds/source
+ls -la /tmp/builds/source/project
 
 # mkdir -p /tmp/builds/source/code
 # cp -r $(pwd)/* /tmp/builds/source/code
