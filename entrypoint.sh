@@ -14,4 +14,6 @@ cat /tmp/project/Makefile
 cd /tmp/project && docker-compose run development cat Makefile
 cd /tmp/project && docker-compose run development ls -la /project
 
+docker inspect project_development_run
+
 # cd /tmp/project && docker-compose run development make setup test lint
