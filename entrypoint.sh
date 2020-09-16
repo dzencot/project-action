@@ -1,7 +1,7 @@
 #!/bin/sh -l
 
 echo "mkdir"
-mkdir -p /tmp/builds/source
+mkdir -p $GITHUB_WORKSPACE/source
 
 echo $GITHUB_WORKSPACE
 echo "$(ls -la $GITHUB_WORKSPACE)"
