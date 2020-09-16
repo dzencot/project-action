@@ -1,6 +1,9 @@
 #!/bin/sh -l
 export BUILD_DIRECTORY=$(pwd)/build
 
+echo "BUILD_DIRECTORY"
+echo $BUILD_DIRECTORY
+
 mkdir $BUILD_DIRECTORY
 
 docker run --name project-source  $1:release bash -c 'ls -la /project/'
