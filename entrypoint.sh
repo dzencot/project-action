@@ -1,15 +1,15 @@
 #!/bin/sh -l
 
 echo "mkdir"
-mkdir -p $GITHUB_WORKSPACE/source
+mkdir -p /tmp/builds/source
 
 echo $GITHUB_WORKSPACE
 echo "$(ls -la $GITHUB_WORKSPACE)"
 
-docker run -v "$GITHUB_WORKSPACE/source:/tmp/builds/source:rw" $1:release bash -c 'cp -r /project/* /tmp/builds/source && ls -la /tmp/builds/source && rm -rf /tmp/builds/source/code'
+docker run -n project  $1:release bash -c 'ls -la /project/*'
+docker cp  project:/project/* .
 
-echo "ls -la $GITHUB_WORKSPACE/source"
-ls -la $GITHUB_WORKSPACE/source
+ls -la $(pwd)
 
 # mkdir -p /tmp/builds/source/code
 # cp -r $(pwd)/* /tmp/builds/source/code
