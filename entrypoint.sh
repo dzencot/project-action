@@ -7,10 +7,10 @@ echo "ls -la /project/"
 
 docker run --name project-source  $1:release bash -c 'ls -la /project/'
 echo "docker cp"
-docker cp  project-source:/project/ /tmp/builds/source
+docker cp  project-source:/project /tmp
 
-echo "ls -la tmp"
-ls -la /tmp/builds/source/project/project
+echo "ls -la /tmp/project"
+ls -la /tmp/project
 
 # mkdir -p /tmp/builds/source/code
 # cp -r $(pwd)/* /tmp/builds/source/code
