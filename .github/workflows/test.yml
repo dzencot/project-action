@@ -1,0 +1,16 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Hexlet project check
+        uses: hexlet/project-action@master
+        with:
+          project_image: ${{ env.PROJECT_IMAGE }}
