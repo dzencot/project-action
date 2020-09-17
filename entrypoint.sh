@@ -15,14 +15,14 @@ ls -la $BUILD_DIRECTORY
 
 rm -rf $BUILD_DIRECTORY/code/*
 
-cp -r !(build) $BUILD_DIRECTORY/code/
+cp -r !($BUILD_DIRECTORY) $BUILD_DIRECTORY/code/
 
 cat $BUILD_DIRECTORY/Makefile
 
-cd $BUILD_DIRECTORY/project && docker-compose run development cat Makefile
+cd $BUILD_DIRECTORY && docker-compose run development cat Makefile
 # cd /tmp/project && docker-compose run development ls -la /project
 
 # docker ps -a
 # docker inspect $(docker ps -a | grep 'project_development' | awk '{print $1}')
 
-# cd /tmp/project && docker-compose run development make setup test lint
+cd $BUILD_DIRECTORY && docker-compose run development make setup test lint
