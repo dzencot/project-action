@@ -4,34 +4,39 @@ inputs:
   project_image:
     description: 'Docker image from original project repository.'
     required: true
-outputs:
-  time:
-    description: 'The time we greeted you'
+  mount_point:
+    description: 'Build directory'
+    required: false
+    default: '/var/tmp'
+
 runs:
   using: 'composite'
   steps:
+    - run: docker login registry.gitlab.com -u hexlet -p ck56czdbKSfoPPoJfVNf
+      shell: bash
+
     - name: Create build directory
       run: |
-        mkdir -p /var/tmp/source
+        mkdir -p ${{ inputs.mount_point }}/source
       shell: bash
 
     - name: Copy original project files
       run: |
-        docker run -v "/var/tmp:/mnt" ${{ inputs.project_image }}:release bash -c 'cp -r /project/* /mnt/source && rm -rf /mnt/source/code'
+        docker run -v "${{ inputs.mount_point }}:/mnt" ${{ inputs.project_image }}:release bash -c 'cp -r /project/* /mnt/source && rm -rf /mnt/source/code'
       shell: bash
 
     - name: Create user code directory
       run: |
-        mkdir -p /var/tmp/source/code
+        mkdir -p ${{ inputs.mount_point }}/source/code
       shell: bash
 
     - name: Copy user project to build directory
       run: |
-        cp -r `pwd`/* /var/tmp/source/code
+        cp -r `pwd`/* ${{ inputs.mount_point }}/source/code
       shell: bash
 
     - name: Run tests
       run: |
-        cd /var/tmp/source && docker-compose run development make setup test lint
+        cd ${{ inputs.mount_point }}/source && docker-compose run development make setup test lint
       shell: bash
 
