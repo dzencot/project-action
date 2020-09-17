@@ -15,9 +15,7 @@ ls -la $BUILD_DIRECTORY
 
 rm -rf $BUILD_DIRECTORY/code/*
 
-cp -r !($BUILD_DIRECTORY) $BUILD_DIRECTORY/code/
-
-cat $BUILD_DIRECTORY/Makefile
+cp -r $(ls | grep -v '^build$') $BUILD_DIRECTORY/code/
 
 cd $BUILD_DIRECTORY && docker-compose run development cat Makefile
 # cd /tmp/project && docker-compose run development ls -la /project
