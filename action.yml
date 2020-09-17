@@ -7,9 +7,28 @@ inputs:
 outputs:
   time:
     description: 'The time we greeted you'
+env:
+  MOUNT_POINT: /vat/tmp
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.project_image }}
+  using: 'composite'
+  steps:
+    - name: Create build directory
+      run: |
+        mkdir -p ${{ env.MOUNT_POINT }}/source
+
+    - name: Copy original project files
+      run: |
+        docker run -v "${{ env.MOUNT_POINT }}:/mnt" ${{ inputs.project_image }}:release bash -c 'cp -r /project/* /mnt/source && rm -rf /mnt/source/code'
+
+    - name: Create user code directory
+      run: |
+        mkdir -p ${{ env.MOUNT_POINT }}/source/code
+
+    - name: Copy user project to build directory
+      run: |
+        cp -r `pwd`/* ${{ env.MOUNT_POINT }}/source/code
+
+    - name: Run tests
+      run: |
+        cd ${{ env.MOUNT_POINT }}/source && docker-compose run development make setup test lint
 
