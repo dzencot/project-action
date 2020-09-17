@@ -15,7 +15,7 @@ ls -la $BUILD_DIRECTORY
 
 rm -rf $BUILD_DIRECTORY/code/*
 
-cp -r $(pwd)/* $BUILD_DIRECTORY/code/
+cp -r !(build) $BUILD_DIRECTORY/code/
 
 cat $BUILD_DIRECTORY/Makefile
 
