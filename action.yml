@@ -15,20 +15,25 @@ runs:
     - name: Create build directory
       run: |
         mkdir -p ${{ env.MOUNT_POINT }}/source
+      shell: bash
 
     - name: Copy original project files
       run: |
         docker run -v "${{ env.MOUNT_POINT }}:/mnt" ${{ inputs.project_image }}:release bash -c 'cp -r /project/* /mnt/source && rm -rf /mnt/source/code'
+      shell: bash
 
     - name: Create user code directory
       run: |
         mkdir -p ${{ env.MOUNT_POINT }}/source/code
+      shell: bash
 
     - name: Copy user project to build directory
       run: |
         cp -r `pwd`/* ${{ env.MOUNT_POINT }}/source/code
+      shell: bash
 
     - name: Run tests
       run: |
         cd ${{ env.MOUNT_POINT }}/source && docker-compose run development make setup test lint
+      shell: bash
 
