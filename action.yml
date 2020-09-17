@@ -8,7 +8,7 @@ outputs:
   time:
     description: 'The time we greeted you'
 env:
-  MOUNT_POINT: /vat/tmp
+  MOUNT_POINT: /var/tmp
 runs:
   using: 'composite'
   steps:
