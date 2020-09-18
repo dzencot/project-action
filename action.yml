@@ -22,7 +22,7 @@ runs:
 
     - name: Copy original project files
       run: |
-        docker run -v "${{ inputs.mount_point }}:/mnt" ${{ inputs.project_image }}:release bash -c 'cp -r /project/* /mnt/source && rm -rf /mnt/source/code'
+        docker run -v "${{ inputs.mount_point }}:/mnt" ${{ inputs.project_image }}:release bash -c 'cp -r /project/. /mnt/source && rm -rf /mnt/source/code'
       shell: bash
 
     - name: Create user code directory
@@ -32,7 +32,7 @@ runs:
 
     - name: Copy user project to build directory
       run: |
-        cp -r `pwd`/* ${{ inputs.mount_point }}/source/code
+        cp -r `pwd`/. ${{ inputs.mount_point }}/source/code
       shell: bash
 
     - name: Run tests
