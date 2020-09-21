@@ -12,9 +12,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - run: docker login registry.gitlab.com -u hexlet -p ck56czdbKSfoPPoJfVNf
-      shell: bash
-
     - name: Create build directory
       run: |
         mkdir -p ${{ inputs.mount_point }}/source
