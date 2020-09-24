@@ -12,6 +12,12 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: get project base image name
+      id: project
+      run: |
+        curl -s https://admin:nginxpassword@hexletdev.com/public_api/project?github_repository="PlugIN73/backend-project-lvl1" | python3 -c "import sys, json; print(json.load(sys.stdin)['project']['image_name'])" | { read image_name; echo "::set-output name=image-name::$image_name"; }
+      shell: bash
+
     - name: Create build directory
       run: |
         mkdir -p ${{ inputs.mount_point }}/source
@@ -19,7 +25,7 @@ runs:
 
     - name: Copy original project files
       run: |
-        docker run -v "${{ inputs.mount_point }}:/mnt" ${{ inputs.project_image }}:release bash -c 'cp -r /project/. /mnt/source && rm -rf /mnt/source/code'
+        docker run -v "${{ inputs.mount_point }}:/mnt" ${{ steps.project.outputs.image-name }}:release bash -c 'cp -r /project/. /mnt/source && rm -rf /mnt/source/code'
       shell: bash
 
     - name: Create user code directory
