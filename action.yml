@@ -25,7 +25,7 @@ runs:
 
     - name: Copy original project files
       run: |
-        docker run -v "${{ inputs.mount_point }}:/mnt" ${{ steps.project.outputs.image-name }}:release bash -c 'cp -r /project/. /mnt/source && rm -rf /mnt/source/code'
+        docker run -v "${{ inputs.mount_point }}:/mnt" hexletprojects/${{ steps.project.outputs.image-name }}:release bash -c 'cp -r /project/. /mnt/source && rm -rf /mnt/source/code'
       shell: bash
 
     - name: Create user code directory
