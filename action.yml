@@ -1,9 +1,6 @@
 name: 'Hexlet project action'
 description: 'For testing projects'
 inputs:
-  project_image:
-    description: 'Docker image from original project repository.'
-    required: false
   api_url:
     required: false
     description: 'Hexlet api url for getting image name'
