@@ -19,7 +19,7 @@ runs:
     - name: get project base image name
       id: project
       run: |
-        curl -s '${{ inputs.api_url }}?github_repository="${{env.GITHUB_REPOSITORY}}"' | python3 -c "import sys, json; print(json.load(sys.stdin)['project']['image_name'])" | { read image_name; echo "::set-output name=image-name::$image_name"; }
+        curl -s '${{ inputs.api_url }}?github_repository="${{github.repository}}"' | python3 -c "import sys, json; print(json.load(sys.stdin)['project']['image_name'])" | { read image_name; echo "::set-output name=image-name::$image_name"; }
       shell: bash
 
     - name: Create build directory
