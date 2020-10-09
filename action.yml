@@ -16,11 +16,11 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Get readiness for checking repo
-      id: project_member
-      run: |
-        curl -s '${{ inputs.api_url }}/ready_to_check/?github_repository=${{github.repository}}' | { read ready_to_check; echo "::set-output name=::$ready_to_check"; }
-      shell: bash
+    # - name: Get readiness for checking repo
+    #   id: project_member
+    #   run: |
+    #     curl -s '${{ inputs.api_url }}/ready_to_check/?github_repository=${{github.repository}}' | { read ready_to_check; echo "::set-output name=::$ready_to_check"; }
+    #   shell: bash
 
     - name: get project base image name
       id: project
