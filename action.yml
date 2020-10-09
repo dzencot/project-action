@@ -7,7 +7,7 @@ inputs:
   api_url:
     required: false
     description: 'Hexlet api url for getting image name'
-    default: 'https://hexlet.io/api/github_workflow/v1/project'
+    default: 'https://admin:nginxpassword@hexletdev.com/api/github_workflow/v1/project'
   mount_point:
     description: 'Build directory'
     required: false
