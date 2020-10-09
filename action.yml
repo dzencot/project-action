@@ -19,13 +19,16 @@ runs:
     - name: Get readiness for checking repo
       id: project_member
       run: |
-        curl -s '${{ inputs.api_url }}/ready_to_check/?github_repository=${{github.repository}}' | python3 -c "import sys, json; print(json.load(sys.stdin))" | {          read image_name; echo "::set-output name=image-name::$image_name"; }
+        curl -s '${{ inputs.api_url }}/ready_to_check/?github_repository=${{github.repository}}' |
+        python3 -c "import sys, json; ready_to_check = json.load(sys.stdin); if !ready_to_check; print('Hexlet check will run after the last project step.'); exit(1) end"
       shell: bash
 
     - name: get project base image name
       id: project
       run: |
-        curl -s '${{ inputs.api_url }}?github_repository=${{github.repository}}' | python3 -c "import sys, json; print(json.load(sys.stdin)['project']['image_name'])" | { read image_name; echo "::set-output name=image-name::$image_name"; }
+        curl -s '${{ inputs.api_url }}?github_repository=${{github.repository}}' |
+        python3 -c "import sys, json; print(json.load(sys.stdin)['project']['image_name'])" |
+        { read image_name; echo "::set-output name=image-name::$image_name"; }
       shell: bash
 
     - name: Create build directory
