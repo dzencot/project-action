@@ -51,8 +51,12 @@ runs:
         cp -r `pwd`/. ${{ inputs.mount_point }}/source/code
       shell: bash
 
+    - name: Create a tag
+      run: |
+        docker tag hexletprojects/${{ steps.project.outputs.image-name }}:release source_development:latest
+      shell: bash
+
     - name: Run tests
       run: |
         cd ${{ inputs.mount_point }}/source && docker-compose run development make setup test lint
       shell: bash
-
