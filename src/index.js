@@ -55,8 +55,8 @@ const uploadArtifacts = async () => {
 
 const isLastStepProject = () => {
   const urlCheck = new URL('ready_to_check/', apiUrl);
-  const responseCheck = execSync(`curl -s ${urlCheck.toString()}`);
   urlCheck.searchParams.set('github_repository', githubRepository);
+  const responseCheck = execSync(`curl -s ${urlCheck.toString()}`);
   return JSON.parse(responseCheck.toString());
 };
 
