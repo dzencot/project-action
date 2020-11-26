@@ -53,15 +53,43 @@ const uploadArtifacts = async () => {
   core.warning('The link is above the output window.');
 };
 
-const app = async () => {
-  core.info('Checking the possibility of starting testing...');
-  // Get readiness for checking repo
+const isLastStepProject = () => {
   const urlCheck = new URL('ready_to_check/', apiUrl);
-  urlCheck.searchParams.set('github_repository', githubRepository);
   const responseCheck = execSync(`curl -s ${urlCheck.toString()}`);
+  urlCheck.searchParams.set('github_repository', githubRepository);
+  return JSON.parse(responseCheck.toString());
+};
+
+const getImageName = () => {
+  const urlProject = new URL(apiUrl);
+  urlProject.searchParams.set('github_repository', githubRepository);
+  const responseProject = execSync(`curl -s ${urlProject.toString()}`);
+  const data = JSON.parse(responseProject.toString());
+  return get(data, 'project.image_name');
+};
+
+const runPreparationForTesting = async (imageName) => {
+  await io.mkdirP(buildPath);
+  // Copy original project files
+  await exec.exec(
+    `docker run -v ${mountPoint}:/mnt hexletprojects/${imageName}:release bash -c "cp -r /project/. /mnt/source && rm -rf /mnt/source/code"`,
+    [],
+    { silent: true },
+  );
+  await io.mkdirP(codePath);
+  await io.cp(`${projectPath}/.`, codePath, { recursive: true });
+  await exec.exec(`docker tag hexletprojects/${imageName}:release source_development:latest`, [], { silent: true });
+  await exec.exec('docker-compose', ['build'], { cwd: buildPath, silent: true });
+};
+
+const runSetupTestLint = async () => {
+  await exec.exec('docker-compose', ['run', 'development', 'make', 'setup', 'test', 'lint'], { cwd: buildPath });
+};
+
+const runAction = async () => {
+  core.info('Checking the possibility of starting testing...');
   try {
-    const result = JSON.parse(responseCheck.toString());
-    if (!result) {
+    if (!isLastStepProject()) {
       core.error('Hexlet check will run after finish the last project step.');
       process.exit(1);
     }
@@ -70,14 +98,9 @@ const app = async () => {
     process.exit(1);
   }
 
-  // Get project base image name
   let imageName;
-  const urlProject = new URL(apiUrl);
-  urlProject.searchParams.set('github_repository', githubRepository);
-  const responseProject = execSync(`curl -s ${urlProject.toString()}`);
   try {
-    const data = JSON.parse(responseProject.toString());
-    imageName = get(data, 'project.image_name');
+    imageName = getImageName();
     if (!imageName) {
       core.error('Image name is not defined!');
       process.exit(1);
@@ -89,38 +112,16 @@ const app = async () => {
   core.info('\u001b[38;5;6mChecking completed.');
 
   core.info('Preparing to start testing. It can take some time. Please wait...');
-  // Create build directory
-  await io.mkdirP(buildPath);
-
-  // Copy original project files
-  await exec.exec(
-    `docker run -v ${mountPoint}:/mnt hexletprojects/${imageName}:release bash -c "cp -r /project/. /mnt/source && rm -rf /mnt/source/code"`,
-    [],
-    { silent: true },
-  );
-
-  // Create user code directory
-  await io.mkdirP(codePath);
-
-  // Copy user project to build directory
-  await io.cp(`${projectPath}/.`, codePath, { recursive: true });
-
-  // Create a tags
-  await exec.exec(`docker tag hexletprojects/${imageName}:release source_development:latest`, [], { silent: true });
-
-  // Build images
-  await exec.exec('docker-compose', ['build'], { cwd: buildPath, silent: true });
+  await runPreparationForTesting(imageName);
   core.info('\u001b[38;5;6mPreparing completed.');
 
   try {
-    // Run setup, tests, lint
-    await exec.exec('docker-compose', ['run', 'development', 'make', 'setup', 'test', 'lint'], { cwd: buildPath });
+    await runSetupTestLint();
   } catch (e) {
-    // Upload artifacts
     await uploadArtifacts();
     core.error('Testing failed. See the output.');
     process.exit(1);
   }
 };
 
-app();
+runAction();
