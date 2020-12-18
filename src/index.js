@@ -91,7 +91,7 @@ const runAction = async () => {
   try {
     if (!isLastStepProject()) {
       core.error('Hexlet check will run after finish the last project step.');
-      process.exit(1);
+      process.exit(0);
     }
   } catch (e) {
     core.error('Project or user not found!');
