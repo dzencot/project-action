@@ -2,5 +2,8 @@ install:
 	npm install
 
 build:
-	rm -rf dist
 	npm run build
+
+# TODO: release authomatically after build
+release:
+	git push -f origin master:release
