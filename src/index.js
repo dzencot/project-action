@@ -7,6 +7,7 @@ const core = require('@actions/core');
 const io = require('@actions/io');
 const exec = require('@actions/exec');
 const { HttpClient } = require('@actions/http-client');
+const chalk = require('chalk');
 // const { execSync } = require('child_process');
 // const _ = require('lodash');
 
@@ -60,7 +61,10 @@ const prepareProject = async (options) => {
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], { cwd: projectSourcePath, silent: !verbose });
 };
 
-const check = ({ projectSourcePath }) => exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], { cwd: projectSourcePath });
+const check = async ({ projectSourcePath, verbose }) => {
+  const options = { cwd: projectSourcePath, silent: !verbose };
+  await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
+};
 
 const run = async ({
   projectPath, mountPath, verbose, projectMemberId,
@@ -98,11 +102,11 @@ const run = async ({
     mountPath,
   };
 
-  core.info('prepearing');
+  core.info(chalk.blue('Prepearing'));
   await prepareProject(options);
-  core.info('checking');
+  core.info(chalk.blue('Checking'));
   await check(options);
-  core.info('finishing');
+  core.info(chalk.blue('Finishing'));
   await uploadArtifacts(options);
 };
 

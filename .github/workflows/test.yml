@@ -1,26 +1,4 @@
-# name: Build and Test
-
-# on:
-#   push:
-#     branches:
-#       - master
-
-# env:
-#   MOUNT_POINT: /tmp/builds
-#   PROJECT_IMAGE: registry.gitlab.com/hexlethq/boilerplates/php_example_project
-
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Hexlet project check
-#         uses: hexlet/project-action@master
-#         with:
-#           project_image: ${{ env.PROJECT_IMAGE }}
-
-name: "units-test"
+name: "test"
 on:
   pull_request:
   push:
@@ -29,14 +7,6 @@ on:
       # - 'releases/*'
 
 jobs:
-  # unit tests
-  # units:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - run: npm ci
-  #   - run: npm test
-
   test:
     runs-on: ubuntu-latest
     steps:

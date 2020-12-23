@@ -4,10 +4,12 @@ const path = require('path');
 const os = require('os');
 const nock = require('nock');
 const { URL } = require('url');
+const { execSync } = require('child_process');
 const run = require('../src/index.js');
 const routes = require('../src/routes.js');
 
 const fsp = fs.promises;
+const projectFixture = path.join(__dirname, '../__fixtures__/project_source');
 
 nock.disableNetConnect();
 
@@ -27,6 +29,8 @@ test('run', async () => {
   const tmp = os.tmpdir();
   const mountPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
   const projectPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
+  execSync(`cp -r ${projectFixture}/. ${projectPath}`);
+
   await run({
     mountPath, projectPath, verbose: true, projectMemberId,
   });

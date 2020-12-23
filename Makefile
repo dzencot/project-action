@@ -5,7 +5,7 @@ build:
 	npm run build
 
 test:
-	npx jest
+	ACTIONS_RUNNER_DEBUG=1 npx jest
 
 lint:
 	npx eslint .
