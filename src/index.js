@@ -13,7 +13,7 @@ const chalk = require('chalk');
 // const { execSync } = require('child_process');
 // const _ = require('lodash');
 
-const routes = require('./routes.js');
+const buildRoutes = require('./routes.js');
 
 const uploadArtifacts = async ({ diffpath }) => {
   if (!fs.existsSync(diffpath)) {
@@ -71,6 +71,7 @@ const check = async ({ projectSourcePath, verbose }) => {
 const run = async ({
   projectPath, mountPath, verbose, projectMemberId,
 }) => {
+  const routes = buildRoutes(process.env.API_HOST);
   const projectSourcePath = path.join(mountPath, 'source');
   const codePath = path.join(projectSourcePath, 'code');
 
