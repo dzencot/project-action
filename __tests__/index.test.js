@@ -34,4 +34,4 @@ test('run', async () => {
   await run({
     mountPath, projectPath, verbose: true, projectMemberId,
   });
-}, 10000);
+}, 50000);
