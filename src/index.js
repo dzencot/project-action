@@ -1,3 +1,5 @@
+// @ts-check
+
 // https://github.com/actions/javascript-action
 
 const fs = require('fs');

@@ -1,3 +1,5 @@
+// @ts-check
+
 const path = require('path');
 const core = require('@actions/core');
 const run = require('../index.js');

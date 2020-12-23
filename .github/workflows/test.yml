@@ -19,6 +19,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: ./
+      env:
+        NODE_DEBUG: http
+        HTTPS_PROXY: localhost
       with:
         project-member-id: 1
         verbose: true
