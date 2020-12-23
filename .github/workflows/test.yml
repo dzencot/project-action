@@ -26,7 +26,7 @@ on:
   push:
     branches:
       - main
-      - 'releases/*'
+      # - 'releases/*'
 
 jobs:
   # unit tests
@@ -37,7 +37,6 @@ jobs:
   #   - run: npm ci
   #   - run: npm test
 
-  # test action works running from the graph
   test:
     runs-on: ubuntu-latest
     steps:
@@ -45,4 +44,3 @@ jobs:
     - uses: ./
       with:
         project-member-id: 1
-        milliseconds: 1000
