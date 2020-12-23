@@ -18,10 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - run: node server.js
     - uses: ./
       env:
         NODE_DEBUG: http
-        HTTPS_PROXY: localhost
+        HTTPS_PROXY: http://localhost:3000
       with:
         project-member-id: 1
         verbose: true

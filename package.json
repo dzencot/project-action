@@ -24,6 +24,7 @@
     "@actions/http-client": "^1.0.9",
     "@actions/io": "^1.0.2",
     "chalk": "^4.1.0",
+    "fastify": "^3.9.2",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
