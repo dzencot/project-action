@@ -1,9 +1,10 @@
+const { test } = require('@jest/globals');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const nock = require('nock');
-const run = require('../src/index.js');
 const { URL } = require('url');
+const run = require('../src/index.js');
 const routes = require('../src/routes.js');
 
 const fsp = fs.promises;
@@ -16,14 +17,17 @@ test('run', async () => {
   const result = {
     tests_on: true,
     project: {
-      image_name: 'hexlet-project-source-ci'
+      image_name: 'hexlet-project-source-ci',
     },
   };
   nock(url.origin)
     .get(url.pathname)
-    .reply(200, result)
+    .reply(200, result);
 
   const tmp = os.tmpdir();
-  const dir = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
-  await run({ mountPoint: dir, verbose: true, projectMemberId });
-})
+  const mountPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
+  const projectPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
+  await run({
+    mountPath, projectPath, verbose: true, projectMemberId,
+  });
+}, 10000);

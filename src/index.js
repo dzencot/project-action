@@ -45,38 +45,36 @@ const prepareProject = async (options) => {
     projectPath,
     projectMember,
     projectSourcePath,
-    mountPoint
-  } = options
-  const projectImageName = `hexletprojects/${projectMember.project.image_name}:release`;
+    mountPath,
+  } = options;
+  const projectImageName = `hexletprojects/${projectMember.project.image_name}:latest`;
   await io.mkdirP(projectSourcePath);
-  await exec.exec(
-    `docker`,
-    ['run', '-v', `${mountPoint}:/mnt`, projectImageName, 'bash -c "cp -r /project/. /mnt/source"'],
-    { silent: !verbose },
-  );
+  const pullCmd = `docker pull ${projectImageName}"`;
+  await exec.exec(pullCmd);
+  const copyCmd = `docker run -v ${mountPath}:/mnt ${projectImageName} bash -c "cp -r /project/. /mnt/source"`;
+  await exec.exec(copyCmd);
   await io.rmRF(codePath);
   await io.mkdirP(codePath);
-  await io.cp(`${projectPath}/.`, codePath, { recursive: !verbose });
+  await io.cp(`${projectPath}/.`, codePath, { recursive: true });
   // await exec.exec(`docker tag ${projectImageName} source_development:latest`, [], { silent: !verbose });
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], { cwd: projectSourcePath, silent: !verbose });
 };
 
-const check = () =>
-  exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up'], { cwd: projectSourcePath });
+const check = ({ projectSourcePath }) => exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], { cwd: projectSourcePath });
 
-const run = async ({ mountPoint, verbose, projectMemberId }) => {
-  const projectSourcePath = path.join(mountPoint, 'source');
+const run = async ({
+  projectPath, mountPath, verbose, projectMemberId,
+}) => {
+  const projectSourcePath = path.join(mountPath, 'source');
   const codePath = path.join(projectSourcePath, 'code');
-  const projectPath = process.cwd();
 
   const diffpath = path.join(
-    mountPoint,
+    mountPath,
     'source',
     '__tests__',
     '__image_snapshots__',
     '__diff_output__',
   );
-
 
   const link = routes.projectMemberPath(projectMemberId);
   const http = new HttpClient();
@@ -97,7 +95,7 @@ const run = async ({ mountPoint, verbose, projectMemberId }) => {
     diffpath,
     projectMember,
     projectSourcePath,
-    mountPoint,
+    mountPath,
   };
 
   core.info('prepearing');
