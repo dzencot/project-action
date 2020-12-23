@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: make install
-    - run: node server.js
+    - run: node server.js &
     - uses: ./
       env:
         NODE_DEBUG: http
