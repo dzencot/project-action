@@ -13,6 +13,6 @@ const options = {
   projectPath, mountPoint, verbose, projectMemberId,
 };
 
-console.log(JSON.stringify(options));
+core.info(JSON.stringify(options));
 
 run(options);
