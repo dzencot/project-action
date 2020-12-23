@@ -21,3 +21,4 @@ jobs:
     - uses: ./
       with:
         project-member-id: 1
+        verbose: true
