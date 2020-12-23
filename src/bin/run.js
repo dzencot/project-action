@@ -9,6 +9,10 @@ const verbose = core.getInput('verbose', { required: true });
 const projectMemberId = core.getInput('project-member-id', { required: true });
 const projectPath = process.cwd();
 
-run({
+const options = {
   projectPath, mountPoint, verbose, projectMemberId,
-});
+};
+
+console.log(JSON.stringify(options));
+
+run(options);
