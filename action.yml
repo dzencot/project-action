@@ -2,13 +2,10 @@ name: 'Hexlet project action'
 description: 'For testing projects'
 
 inputs:
-  # hexlet-id:  # id of input
-  #   description: 'id'
-  #   required: true
   verbose:
     description: 'show me more!'
     required: false
-    default: "false"
+    default: "true"
 
 env:
   HEXLET_ID: secrets.HEXLET_ID
