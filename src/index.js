@@ -83,9 +83,7 @@ const run = async (params) => {
     '__diff_output__',
   );
 
-  const link = routes.projectMemberPath(projectMemberId);
-  core.debug("projectMemberId");
-  core.debug(projectMemberId);
+  const link = routes.projectMemberPath(7502);
   const http = new HttpClient();
   const response = await http.get(link);
   const data = await response.readBody();
