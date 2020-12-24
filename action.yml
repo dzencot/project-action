@@ -11,7 +11,7 @@ inputs:
     default: "false"
 
 env:
-  HEXLET_ID: ${{ secrets.HEXLET_ID }}
+  HEXLET_ID: secrets.HEXLET_ID
 
 runs:
   using: 'node12'
