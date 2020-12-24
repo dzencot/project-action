@@ -25,6 +25,7 @@ test('run', async () => {
   };
   nock(url.origin)
     .get(url.pathname)
+    .query(true)
     .reply(200, result);
 
   const tmp = os.tmpdir();
