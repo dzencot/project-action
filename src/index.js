@@ -84,6 +84,8 @@ const run = async (params) => {
   );
 
   const link = routes.projectMemberPath(projectMemberId);
+  core.debug("projectMemberId");
+  core.debug(projectMemberId);
   const http = new HttpClient();
   const response = await http.get(link);
   const data = await response.readBody();
