@@ -8,7 +8,7 @@ process.on('unhandledRejection', (up) => { throw up; });
 
 const mountPath = path.join('/', 'var', 'tmp');
 const verbose = core.getInput('verbose', { required: true }) === 'true';
-const projectMemberId = core.getInput('hexlet-id', { required: true });
+const projectMemberId = process.env.HEXLET_ID;
 const projectPath = path.resolve(process.cwd(), process.env.ACTION_PROJECT_PATH || '');
 
 const options = {

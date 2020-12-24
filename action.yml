@@ -2,13 +2,16 @@ name: 'Hexlet project action'
 description: 'For testing projects'
 
 inputs:
-  hexlet-id:  # id of input
-    description: 'id'
-    required: true
+  # hexlet-id:  # id of input
+  #   description: 'id'
+  #   required: true
   verbose:
     description: 'show me more!'
     required: false
     default: "false"
+
+env:
+  HEXLET_ID: ${{ secrets.HEXLET_ID }}
 
 runs:
   using: 'node12'
