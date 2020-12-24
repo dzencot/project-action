@@ -56,9 +56,10 @@ const prepareProject = async (options) => {
   await io.mkdirP(projectSourcePath);
   const pullCmd = `docker pull ${projectImageName}"`;
   await exec.exec(pullCmd);
-  const copyCmd = `docker run -v ${mountPath}:/mnt ${projectImageName} bash -c "cp -r /project/. /mnt/source"`;
+  // TODO: remove runnnig rm -rf command from container
+  const copyCmd = `docker run -v ${mountPath}:/mnt ${projectImageName} bash -c "cp -r /project/. /mnt/source && rm -rf /mnt/source/code"`;
   await exec.exec(copyCmd);
-  await io.rmRF(codePath);
+  // await io.rmRF(codePath);
   await io.mkdirP(codePath);
   await io.cp(`${projectPath}/.`, codePath, { recursive: true });
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], { cwd: projectSourcePath, silent: !verbose });
@@ -78,9 +79,8 @@ const run = async (params) => {
   const diffpath = path.join(
     mountPath,
     'source',
-    '__tests__',
-    '__image_snapshots__',
-    '__diff_output__',
+    'tmp',
+    'artifacts',
   );
 
   const link = routes.projectMemberPath(7502);

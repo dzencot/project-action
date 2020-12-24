@@ -4,7 +4,11 @@ const path = require('path');
 const apiUrl = '/api/user_project_github_workflow/';
 
 const buildRoutes = (host = 'https://hexlet.io') => ({
-  projectMemberPath: (id) => path.join(host, apiUrl, `project_members/${id}?format=json`),
+  projectMemberPath: (id) => {
+    const urlPath = path.join(apiUrl, `project_members/${id}?format=json`);
+    const url = new URL(urlPath, host);
+    return url.toString();
+  },
 });
 
 module.exports = buildRoutes;
