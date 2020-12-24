@@ -7,14 +7,15 @@ on:
       # - 'releases/*'
 
 jobs:
-  jest:
+  tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - run: make install
     - run: make test
+    - run: make lint
 
-  test:
+  e2e:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -23,7 +24,8 @@ jobs:
     - uses: ./
       env:
         NODE_DEBUG: http
-        API_HOST: http://localhost:3000
+        ACTION_API_HOST: http://localhost:3000
+        ACTION_PROJECT_PATH: __fixtures__/project_source
       with:
         project-member-id: 1
         verbose: true

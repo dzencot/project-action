@@ -1,7 +1,9 @@
-const fastify = require('fastify')({ logger: true })
+// @ts-check
+
+const fastify = require('fastify')({ logger: true });
 
 // Declare a route
-fastify.get('/api/user_project_github_workflow/project_members/:id', async (request, reply) => {
+fastify.get('/api/user_project_github_workflow/project_members/:id', async () => {
   const result = {
     tests_on: true,
     project: {

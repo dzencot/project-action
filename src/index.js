@@ -9,7 +9,7 @@ const core = require('@actions/core');
 const io = require('@actions/io');
 const exec = require('@actions/exec');
 const { HttpClient } = require('@actions/http-client');
-const chalk = require('chalk');
+// const chalk = require('chalk');
 // const { execSync } = require('child_process');
 // const _ = require('lodash');
 
@@ -25,6 +25,7 @@ const uploadArtifacts = async ({ diffpath }) => {
     return;
   }
 
+  // https://github.com/actions/toolkit/tree/main/packages/glob
   const filepaths = fs
     .readdirSync(diffpath, { withFileTypes: true })
     .filter((dirent) => dirent.isFile())
@@ -59,7 +60,6 @@ const prepareProject = async (options) => {
   await io.rmRF(codePath);
   await io.mkdirP(codePath);
   await io.cp(`${projectPath}/.`, codePath, { recursive: true });
-  // await exec.exec(`docker tag ${projectImageName} source_development:latest`, [], { silent: !verbose });
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], { cwd: projectSourcePath, silent: !verbose });
 };
 
@@ -71,7 +71,7 @@ const check = async ({ projectSourcePath, verbose }) => {
 const run = async ({
   projectPath, mountPath, verbose, projectMemberId,
 }) => {
-  const routes = buildRoutes(process.env.API_HOST);
+  const routes = buildRoutes(process.env.ACTION_API_HOST);
   const projectSourcePath = path.join(mountPath, 'source');
   const codePath = path.join(projectSourcePath, 'code');
 
@@ -87,8 +87,8 @@ const run = async ({
   const http = new HttpClient();
   const response = await http.get(link);
   const data = await response.readBody();
+  core.debug(data);
   const projectMember = JSON.parse(data);
-  // console.log(projectMember);
 
   if (!projectMember.tests_on) {
     core.info('Tests will run during review step');
@@ -105,12 +105,9 @@ const run = async ({
     mountPath,
   };
 
-  core.info(chalk.blue('Prepearing'));
-  await prepareProject(options);
-  core.info(chalk.blue('Checking'));
-  await check(options);
-  core.info(chalk.blue('Finishing'));
-  await uploadArtifacts(options);
+  await core.group('Preparing', () => prepareProject(options));
+  await core.group('Checking', () => check(options));
+  await core.group('Finishing', () => uploadArtifacts(options));
 };
 
 module.exports = run;
