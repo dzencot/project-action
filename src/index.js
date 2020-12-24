@@ -56,7 +56,8 @@ const prepareProject = async (options) => {
   await io.mkdirP(projectSourcePath);
   const pullCmd = `docker pull ${projectImageName}"`;
   await exec.exec(pullCmd);
-  // TODO: remove runnnig rm -rf command from container
+  // TODO: the code directory remove from the container, since it was created under the rights of root. 
+  // await io.rmRF(codePath); - deletes a directory with the rights of the current user
   const copyCmd = `docker run -v ${mountPath}:/mnt ${projectImageName} bash -c "cp -r /project/. /mnt/source && rm -rf /mnt/source/code"`;
   await exec.exec(copyCmd);
   // await io.rmRF(codePath);
