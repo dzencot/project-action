@@ -84,7 +84,7 @@ const run = async (params) => {
     'artifacts',
   );
 
-  const link = routes.projectMemberPath(7502);
+  const link = routes.projectMemberPath(projectMemberId);
   const http = new HttpClient();
   const response = await http.get(link);
   const data = await response.readBody();
