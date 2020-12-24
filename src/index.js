@@ -9,6 +9,7 @@ const core = require('@actions/core');
 const io = require('@actions/io');
 const exec = require('@actions/exec');
 const { HttpClient } = require('@actions/http-client');
+
 // const chalk = require('chalk');
 // const { execSync } = require('child_process');
 // const _ = require('lodash');
@@ -68,9 +69,8 @@ const check = async ({ projectSourcePath, verbose }) => {
   await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
 };
 
-const run = async ({
-  projectPath, mountPath, verbose, projectMemberId,
-}) => {
+const run = async (params) => {
+  const { mountPath, projectMemberId } = params;
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const projectSourcePath = path.join(mountPath, 'source');
   const codePath = path.join(projectSourcePath, 'code');
@@ -96,13 +96,11 @@ const run = async ({
   }
 
   const options = {
-    verbose,
+    ...params,
     codePath,
-    projectPath,
     diffpath,
     projectMember,
     projectSourcePath,
-    mountPath,
   };
 
   await core.group('Preparing', () => prepareProject(options));

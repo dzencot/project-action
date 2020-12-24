@@ -15,6 +15,6 @@ const options = {
   projectPath, mountPath, verbose, projectMemberId,
 };
 
-core.info(JSON.stringify(options));
+// core.debug(JSON.stringify(options));
 
 run(options);
