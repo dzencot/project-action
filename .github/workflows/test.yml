@@ -27,5 +27,5 @@ jobs:
         ACTION_API_HOST: http://localhost:3000
         ACTION_PROJECT_PATH: __fixtures__/project_source
       with:
-        project-member-id: 1
+        hexlet-id: 1
         verbose: true
