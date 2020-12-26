@@ -40,7 +40,9 @@ const uploadArtifacts = async (diffpath) => {
   const artifactName = 'test-results';
   await artifactClient.uploadArtifact(artifactName, filepaths, diffpath);
   // NOTE: Users need notification that screenshots have been generated. Not error.
-  core.warning('Download snapshots from Artifacts.');
+  // TODO: This output is not visible from the outside.
+  // It is necessary to make the user see this inscription.
+  core.info('Download snapshots from Artifacts.');
 };
 
 const prepareProject = async (options) => {
