@@ -5,7 +5,7 @@ const os = require('os');
 const nock = require('nock');
 const { URL } = require('url');
 const { execSync } = require('child_process');
-const run = require('../src/index.js');
+const { runTests } = require('../src/index.js');
 const buildRoutes = require('../src/routes.js');
 
 const fsp = fs.promises;
@@ -13,7 +13,7 @@ const projectFixture = path.join(__dirname, '../__fixtures__/project_source');
 
 nock.disableNetConnect();
 
-test('run', async () => {
+test('runTests', async () => {
   const routes = buildRoutes();
   const projectMemberId = 1;
   const url = new URL(routes.projectMemberPath(projectMemberId));
@@ -33,7 +33,7 @@ test('run', async () => {
   const projectPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
   execSync(`cp -r ${projectFixture}/. ${projectPath}`);
 
-  await run({
+  await runTests({
     mountPath, projectPath, verbose: true, projectMemberId,
   });
 }, 50000);

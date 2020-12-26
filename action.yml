@@ -9,7 +9,12 @@ inputs:
     description: 'show me more!'
     required: false
     default: "true"
+  mount-path:
+    description: 'mount path'
+    required: true
+    default: "/var/tmp"
 
 runs:
   using: 'node12'
-  main: 'dist/index.js'
+  main: 'dist/run-tests/index.js'
+  post: 'dist/run-post-actions/index.js'

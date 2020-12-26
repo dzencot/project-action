@@ -16,7 +16,7 @@ const { HttpClient } = require('@actions/http-client');
 
 const buildRoutes = require('./routes.js');
 
-const uploadArtifacts = async ({ diffpath }) => {
+const uploadArtifacts = async (diffpath) => {
   if (!fs.existsSync(diffpath)) {
     return;
   }
@@ -30,7 +30,7 @@ const uploadArtifacts = async ({ diffpath }) => {
   const filepaths = fs
     .readdirSync(diffpath, { withFileTypes: true })
     .filter((dirent) => dirent.isFile())
-    .map((dirent) => dirent.name);
+    .map((dirent) => path.join(diffpath, dirent.name));
 
   // if (filepaths.length === 0) {
   //   return;
@@ -39,13 +39,14 @@ const uploadArtifacts = async ({ diffpath }) => {
   const artifactClient = artifact.create();
   const artifactName = 'test-results';
   await artifactClient.uploadArtifact(artifactName, filepaths, diffpath);
-  // core.warning('Download snapshots from Artifacts.');
-  // core.warning('The link is above the output window.');
+  // NOTE: Users need notification that screenshots have been generated. Not error.
+  // TODO: This output is not visible from the outside.
+  // It is necessary to make the user see this inscription.
+  core.info('Download snapshots from Artifacts.');
 };
 
 const prepareProject = async (options) => {
   const {
-    verbose,
     codePath,
     projectPath,
     projectMember,
@@ -56,34 +57,28 @@ const prepareProject = async (options) => {
   await io.mkdirP(projectSourcePath);
   const pullCmd = `docker pull ${projectImageName}"`;
   await exec.exec(pullCmd);
-  // TODO: the code directory remove from the container,
+  // NOTE: the code directory remove from the container,
   // since it was created under the rights of root.
   // await io.rmRF(codePath); - deletes a directory with the rights of the current user
   const copyCmd = `docker run -v ${mountPath}:/mnt ${projectImageName} bash -c "cp -r /project/. /mnt/source && rm -rf /mnt/source/code"`;
   await exec.exec(copyCmd);
-  // await io.rmRF(codePath);
   await io.mkdirP(codePath);
   await io.cp(`${projectPath}/.`, codePath, { recursive: true });
-  await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], { cwd: projectSourcePath, silent: !verbose });
+  await exec.exec('docker', ['build', '--cache-from', projectImageName, '.'], { cwd: projectSourcePath });
 };
 
 const check = async ({ projectSourcePath, verbose }) => {
   const options = { cwd: projectSourcePath, silent: !verbose };
+  // NOTE: Installing dependencies is part of testing the project.
+  await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], options);
   await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
 };
 
-const run = async (params) => {
+const runTests = async (params) => {
   const { mountPath, projectMemberId } = params;
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const projectSourcePath = path.join(mountPath, 'source');
   const codePath = path.join(projectSourcePath, 'code');
-
-  const diffpath = path.join(
-    mountPath,
-    'source',
-    'tmp',
-    'artifacts',
-  );
 
   const link = routes.projectMemberPath(projectMemberId);
   const http = new HttpClient();
@@ -100,14 +95,29 @@ const run = async (params) => {
   const options = {
     ...params,
     codePath,
-    diffpath,
     projectMember,
     projectSourcePath,
   };
 
   await core.group('Preparing', () => prepareProject(options));
   await core.group('Checking', () => check(options));
-  await core.group('Finishing', () => uploadArtifacts(options));
 };
 
-module.exports = run;
+// NOTE: Post actions should be performed regardless of the test completion result.
+const runPostActions = async (params) => {
+  const { mountPath } = params;
+
+  const diffpath = path.join(
+    mountPath,
+    'source',
+    'tmp',
+    'artifacts',
+  );
+
+  await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
+};
+
+module.exports = {
+  runTests,
+  runPostActions,
+};
