@@ -120,7 +120,7 @@ const finishCheck = async (params) => {
 };
 
 // NOTE: Post actions should be performed regardless of the test completion result.
-const runUploadingArtefacts = async (params) => {
+const runPostActions = async (params) => {
   const { mountPath } = params;
 
   const diffpath = path.join(
@@ -131,16 +131,11 @@ const runUploadingArtefacts = async (params) => {
   );
 
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
-};
-
-// NOTE: Post actions should be performed regardless of the test completion result.
-const runCheckFinishing = async (params) => {
-  const { projectMemberId } = params;
 
   await core.group('Finish check', () => finishCheck(projectMemberId));
 };
+
 module.exports = {
   runTests,
-  runUploadingArtefacts,
-  runCheckFinishing,
+  runPostActions,
 };
