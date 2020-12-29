@@ -71,7 +71,9 @@ const check = async ({ projectSourcePath, verbose }) => {
   const options = { cwd: projectSourcePath, silent: !verbose };
   // NOTE: Installing dependencies is part of testing the project.
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], options);
-  await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
+  const exitCode = await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
+
+  return exitCode;
 };
 
 const runTests = async (params) => {
@@ -100,7 +102,15 @@ const runTests = async (params) => {
   };
 
   await core.group('Preparing', () => prepareProject(options));
-  await core.group('Checking', () => check(options));
+  const exitCode = await core.group('Checking', () => check(options));
+
+  const checkData = {
+    check: {
+      state: exitCode === 0 ? 'success' : 'fail',
+    },
+  };
+
+  core.exportVariable('checkData', JSON.stringify(checkData));
 };
 
 const finishCheck = async (params) => {
@@ -108,20 +118,15 @@ const finishCheck = async (params) => {
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const http = new HttpClient();
 
-  const checkData = {
-    check: {
-      state: 'fail',
-    },
-  };
   const link = routes.projectMemberCheckPath(projectMemberId);
-  const response = await http.post(link, JSON.stringify(checkData));
+  const response = await http.post(link, process.env.checkData);
   const data = await response.readBody();
   core.debug(data);
 };
 
 // NOTE: Post actions should be performed regardless of the test completion result.
 const runPostActions = async (params) => {
-  const { mountPath } = params;
+  const { mountPath, projectMemberId } = params;
 
   const diffpath = path.join(
     mountPath,
@@ -130,9 +135,8 @@ const runPostActions = async (params) => {
     'artifacts',
   );
 
-  await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
-
   await core.group('Finish check', () => finishCheck(projectMemberId));
+  await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
 };
 
 module.exports = {
