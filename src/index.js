@@ -119,9 +119,7 @@ const finishCheck = async (projectMemberId) => {
   const http = new HttpClient();
 
   const link = routes.projectMemberCheckPath(projectMemberId);
-  const response = await http.postJson(link, { check: checkState });
-  const data = await response.readBody();
-  core.debug(data);
+  await http.postJson(link, { check: checkState });
 };
 
 // NOTE: Post actions should be performed regardless of the test completion result.
