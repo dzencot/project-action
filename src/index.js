@@ -116,8 +116,7 @@ const runTests = async (params) => {
   await core.group('Checking', () => check(options));
 };
 
-const finishCheck = async (params) => {
-  const { projectMemberId } = params;
+const finishCheck = async (projectMemberId) => {
   const checkData = process.env.checkState;
 
   const routes = buildRoutes(process.env.ACTION_API_HOST);
