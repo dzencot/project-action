@@ -74,9 +74,7 @@ const check = async ({ projectSourcePath, verbose }) => {
   await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
 
   const checkState = {
-    check: {
-      state: 'success',
-    },
+    state: 'success',
   };
   core.exportVariable('checkState', JSON.stringify(checkState));
 };
@@ -87,9 +85,7 @@ const runTests = async (params) => {
   const projectSourcePath = path.join(mountPath, 'source');
   const codePath = path.join(projectSourcePath, 'code');
   const initialCheckState = {
-    check: {
-      state: 'fail',
-    },
+    state: 'fail',
   };
   core.exportVariable('checkState', JSON.stringify(initialCheckState));
 
@@ -117,13 +113,13 @@ const runTests = async (params) => {
 };
 
 const finishCheck = async (projectMemberId) => {
-  const checkData = process.env.checkState;
+  const { checkState } = process.env;
 
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const http = new HttpClient();
 
   const link = routes.projectMemberCheckPath(projectMemberId);
-  const response = await http.post(link, checkData);
+  const response = await http.postJson(link, { check: checkState });
   const data = await response.readBody();
   core.debug(data);
 };
