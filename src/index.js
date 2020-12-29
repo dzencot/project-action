@@ -114,8 +114,6 @@ const runTests = async (params) => {
 
   await core.group('Preparing', () => prepareProject(options));
   await core.group('Checking', () => check(options));
-
-  runPostActions(params);
 };
 
 const finishCheck = async (params) => {
