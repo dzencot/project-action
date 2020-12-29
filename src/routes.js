@@ -9,6 +9,11 @@ const buildRoutes = (host = 'https://hexlet.io') => ({
     const url = new URL(urlPath, host);
     return url.toString();
   },
+  projectMemberCheckPath: (memberId) => {
+    const urlPath = path.join(apiUrl, `project_members/${memberId}/checks.json`);
+    const url = new URL(urlPath, host);
+    return url.toString();
+  },
 });
 
 module.exports = buildRoutes;

@@ -103,8 +103,24 @@ const runTests = async (params) => {
   await core.group('Checking', () => check(options));
 };
 
+const finishCheck = async (params) => {
+  const { projectMemberId } = params;
+  const routes = buildRoutes(process.env.ACTION_API_HOST);
+  const http = new HttpClient();
+
+  const checkData = {
+    check: {
+      state: 'fail',
+    },
+  };
+  const link = routes.projectMemberCheckPath(projectMemberId);
+  const response = await http.post(link, JSON.stringify(checkData));
+  const data = await response.readBody();
+  core.debug(data);
+};
+
 // NOTE: Post actions should be performed regardless of the test completion result.
-const runPostActions = async (params) => {
+const runUploadingArtefacts = async (params) => {
   const { mountPath } = params;
 
   const diffpath = path.join(
@@ -117,7 +133,14 @@ const runPostActions = async (params) => {
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
 };
 
+// NOTE: Post actions should be performed regardless of the test completion result.
+const runCheckFinishing = async (params) => {
+  const { projectMemberId } = params;
+
+  await core.group('Finish check', () => finishCheck(projectMemberId));
+};
 module.exports = {
   runTests,
-  runPostActions,
+  runUploadingArtefacts,
+  runCheckFinishing,
 };
