@@ -135,8 +135,8 @@ const runPostActions = async (params) => {
     'artifacts',
   );
 
-  await core.group('Finish check', () => finishCheck(projectMemberId));
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
+  await core.group('Finish check', () => finishCheck(projectMemberId));
 };
 
 module.exports = {
