@@ -72,6 +72,13 @@ const check = async ({ projectSourcePath, verbose }) => {
   // NOTE: Installing dependencies is part of testing the project.
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], options);
   await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
+
+  const checkState = {
+    check: {
+      state: 'success',
+    },
+  };
+  core.exportVariable('checkState', JSON.stringify(checkState));
 };
 
 const runTests = async (params) => {
@@ -79,6 +86,12 @@ const runTests = async (params) => {
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const projectSourcePath = path.join(mountPath, 'source');
   const codePath = path.join(projectSourcePath, 'code');
+  const initialCheckState = {
+    check: {
+      state: 'fail',
+    },
+  };
+  core.exportVariable('checkState', JSON.stringify(initialCheckState));
 
   const link = routes.projectMemberPath(projectMemberId);
   const http = new HttpClient();
@@ -103,9 +116,22 @@ const runTests = async (params) => {
   await core.group('Checking', () => check(options));
 };
 
+const finishCheck = async (params) => {
+  const { projectMemberId } = params;
+  const checkData = process.env.checkState;
+
+  const routes = buildRoutes(process.env.ACTION_API_HOST);
+  const http = new HttpClient();
+
+  const link = routes.projectMemberCheckPath(projectMemberId);
+  const response = await http.post(link, checkData);
+  const data = await response.readBody();
+  core.debug(data);
+};
+
 // NOTE: Post actions should be performed regardless of the test completion result.
 const runPostActions = async (params) => {
-  const { mountPath } = params;
+  const { mountPath, projectMemberId } = params;
 
   const diffpath = path.join(
     mountPath,
@@ -114,6 +140,7 @@ const runPostActions = async (params) => {
     'artifacts',
   );
 
+  await core.group('Finish check', () => finishCheck(projectMemberId));
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
 };
 
