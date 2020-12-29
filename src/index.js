@@ -52,23 +52,26 @@ const prepareProject = async (options) => {
     projectMember,
     projectSourcePath,
     mountPath,
+    verbose,
   } = options;
+  const cmdOptions = { silent: !verbose };
+
   const projectImageName = `hexletprojects/${projectMember.project.image_name}:latest`;
   await io.mkdirP(projectSourcePath);
   const pullCmd = `docker pull ${projectImageName}"`;
-  await exec.exec(pullCmd);
+  await exec.exec(pullCmd, null, cmdOptions);
   // NOTE: the code directory remove from the container,
   // since it was created under the rights of root.
   // await io.rmRF(codePath); - deletes a directory with the rights of the current user
   const copyCmd = `docker run -v ${mountPath}:/mnt ${projectImageName} bash -c "cp -r /project/. /mnt/source && rm -rf /mnt/source/code"`;
-  await exec.exec(copyCmd);
+  await exec.exec(copyCmd, null, cmdOptions);
   await io.mkdirP(codePath);
   await io.cp(`${projectPath}/.`, codePath, { recursive: true });
-  await exec.exec('docker', ['build', '--cache-from', projectImageName, '.'], { cwd: projectSourcePath });
+  await exec.exec('docker', ['build', '--cache-from', projectImageName, '.'], { ...cmdOptions, cwd: projectSourcePath });
 };
 
-const check = async ({ projectSourcePath, verbose }) => {
-  const options = { cwd: projectSourcePath, silent: !verbose };
+const check = async ({ projectSourcePath }) => {
+  const options = { cwd: projectSourcePath };
   // NOTE: Installing dependencies is part of testing the project.
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], options);
   await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
