@@ -71,9 +71,14 @@ const check = async ({ projectSourcePath, verbose }) => {
   const options = { cwd: projectSourcePath, silent: !verbose };
   // NOTE: Installing dependencies is part of testing the project.
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], options);
-  const exitCode = await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
+  await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
 
-  return exitCode;
+  const checkState = {
+    check: {
+      state: 'success',
+    },
+  };
+  core.exportVariable('checkState', JSON.stringify(checkState));
 };
 
 const runTests = async (params) => {
@@ -81,6 +86,12 @@ const runTests = async (params) => {
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const projectSourcePath = path.join(mountPath, 'source');
   const codePath = path.join(projectSourcePath, 'code');
+  const initialCheckState = {
+    check: {
+      state: 'fail',
+    },
+  };
+  core.exportVariable('checkState', JSON.stringify(initialCheckState));
 
   const link = routes.projectMemberPath(projectMemberId);
   const http = new HttpClient();
@@ -102,24 +113,20 @@ const runTests = async (params) => {
   };
 
   await core.group('Preparing', () => prepareProject(options));
-  const exitCode = await core.group('Checking', () => check(options));
+  await core.group('Checking', () => check(options));
 
-  const checkData = {
-    check: {
-      state: exitCode === 0 ? 'success' : 'fail',
-    },
-  };
-
-  core.exportVariable('checkData', JSON.stringify(checkData));
+  runPostActions(params);
 };
 
 const finishCheck = async (params) => {
   const { projectMemberId } = params;
+  const checkData = process.env.checkState;
+
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const http = new HttpClient();
 
   const link = routes.projectMemberCheckPath(projectMemberId);
-  const response = await http.post(link, process.env.checkData);
+  const response = await http.post(link, checkData);
   const data = await response.readBody();
   core.debug(data);
 };
@@ -135,8 +142,8 @@ const runPostActions = async (params) => {
     'artifacts',
   );
 
-  await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
   await core.group('Finish check', () => finishCheck(projectMemberId));
+  await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
 };
 
 module.exports = {
