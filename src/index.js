@@ -100,7 +100,7 @@ const runTests = async (params) => {
   const projectMember = JSON.parse(data);
 
   if (!projectMember.tests_on) {
-    core.info('Tests will run during review step');
+    core.warning('Tests will run during review step');
     return;
   }
 
@@ -112,7 +112,7 @@ const runTests = async (params) => {
   };
 
   await core.group('Preparing', () => prepareProject(options));
-  await core.group('Checking', () => check(options));
+  await check(options);
 };
 
 const finishCheck = async (projectMemberId) => {
