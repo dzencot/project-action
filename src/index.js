@@ -15,6 +15,7 @@ const { HttpClient } = require('@actions/http-client');
 // const _ = require('lodash');
 
 const buildRoutes = require('./routes.js');
+const { checkPackageName } = require('./packageChecker.js');
 
 const uploadArtifacts = async (diffpath) => {
   if (!fs.existsSync(diffpath)) {
@@ -70,7 +71,8 @@ const prepareProject = async (options) => {
   await exec.exec('docker', ['build', '--cache-from', projectImageName, '.'], { ...cmdOptions, cwd: projectSourcePath });
 };
 
-const check = async ({ projectSourcePath }) => {
+const check = async ({ projectSourcePath, projectMember, codePath }) => {
+  checkPackageName(projectMember.project.image_name, codePath);
   const options = { cwd: projectSourcePath };
   // NOTE: Installing dependencies is part of testing the project.
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], options);
