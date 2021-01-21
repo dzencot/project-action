@@ -21,7 +21,7 @@ const getSourceLang = (imageName) => {
 
 const mapping = {
   python: {
-    expectedPackageName: 'hexlet_code',
+    expectedPackageName: 'hexlet-code',
     getPackageName: (codePath) => (
       getData(getFullPath(codePath, 'pyproject.toml')).tool.poetry.name
     ),
@@ -42,18 +42,19 @@ const mapping = {
 
 const checkPackageName = (imageName, codePath) => {
   const sourceLang = getSourceLang(imageName);
-  const { expectedPackageName, getPackageName } = mapping[sourceLang];
+  const props = mapping[sourceLang];
 
-  // NOTE: If the function for checking the current project
+  // NOTE: If the properties for checking the current project
   // is not found, skip the check.
-  if (!getPackageName) {
+  if (!props) {
     return;
   }
 
+  const { expectedPackageName, getPackageName } = props;
   const packageName = getPackageName(codePath);
 
   if (packageName !== expectedPackageName) {
-    throw new Error(`Package name should be ${expectedPackageName}`);
+    throw new Error(`Package name should be ${expectedPackageName} instead of ${packageName}`);
   }
 };
 
