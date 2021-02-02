@@ -1,0 +1,7 @@
+---
+
+project:
+  language: java
+  name: Project name
+  summary: |
+    Project description

@@ -3,20 +3,23 @@
 const fs = require('fs');
 const path = require('path');
 const ini = require('ini');
+const yaml = require('js-yaml');
+const _ = require('lodash');
 
 const parsers = {
   json: JSON.parse,
   toml: ini.parse,
+  yml: yaml.load,
 };
 
-const getFullPath = (codePath, filename) => path.resolve(codePath, filename);
+const getFullPath = (dirpath, filename) => path.resolve(dirpath, filename);
 const getFormat = (filepath) => path.extname(filepath).slice(1);
 const parse = (content, format) => parsers[format](content);
 const getData = (filepath) => parse(fs.readFileSync(filepath, 'utf-8'), getFormat(filepath));
 
-const getSourceLang = (imageName) => {
-  const indexMarker = imageName.indexOf('_');
-  return imageName.substring(0, indexMarker);
+const getProjectLanguage = (projectSourcePath) => {
+  const spec = getData(getFullPath(projectSourcePath, 'spec.yml'));
+  return _.get(spec, 'project.language');
 };
 
 const mapping = {
@@ -32,7 +35,7 @@ const mapping = {
       getData(getFullPath(codePath, 'composer.json')).name
     ),
   },
-  js: {
+  javascript: {
     expectedPackageName: '@hexlet/code',
     getPackageName: (codePath) => (
       getData(getFullPath(codePath, 'package.json')).name
@@ -40,8 +43,8 @@ const mapping = {
   },
 };
 
-const checkPackageName = (imageName, codePath) => {
-  const sourceLang = getSourceLang(imageName);
+const checkPackageName = (projectSourcePath, codePath) => {
+  const sourceLang = getProjectLanguage(projectSourcePath);
   const props = mapping[sourceLang];
 
   // NOTE: If the properties for checking the current project
