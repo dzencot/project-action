@@ -1,0 +1,7 @@
+---
+
+project:
+  language: javascript
+  name: Project name
+  summary: |
+    Project description

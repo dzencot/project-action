@@ -1,54 +1,58 @@
-const { describe, test, expect } = require('@jest/globals');
+const { describe, test, expect, it } = require('@jest/globals');
 const path = require('path');
+const fs = require('fs');
 
 const { checkPackageName } = require('../src/packageChecker.js');
 
-const verifiableProjects = [
-  'js_l2_differ3_project',
-  'php_l3_page_analyzer_project',
-  'python_l4_task_manager_project',
-];
-
-// NOTE: Some projects are not packages.
-// Also, in some languages, verification is not needed,
-// since the package name is verified when installing the dependencies.
-const notVerifiableProjects = [
-  'css_l1_cognitive_biases_project',
-  'ruby_l1_brain_games_project',
-  'java_l1_brain_games2_project',
-  'hexlet-project-source-ci',
-  'some-project',
-  'someproject',
-  'some_project',
-];
-
-const getFixturePath = (dirname) => (
-  path.join(__dirname, '..', '__fixtures__', 'package_files', dirname)
+const getFixturePath = (...paths) => (
+  path.join(__dirname, '..', '__fixtures__', ...paths)
 );
 
-describe('test projects with correct package name', () => {
-  const codePath = getFixturePath('correct');
+const getCodePath = (dirname) => getFixturePath('package_files', dirname);
 
-  test.each(verifiableProjects)('%s', (imageName) => {
-    expect(() => checkPackageName(imageName, codePath))
+const getProjectSourcePaths = (dirname) => {
+  const projectsPath = getFixturePath('projects_with_spec', dirname);
+  return fs
+    .readdirSync(projectsPath)
+    .map((dirname) => path.join(projectsPath, dirname));
+};
+
+describe('test projects with correct package name', () => {
+  const codePath = getCodePath('correct');
+  const projectSourcePaths = getProjectSourcePaths('verifiable');
+
+  test.each(projectSourcePaths)('%s', (projectSourcePath) => {
+    expect(() => checkPackageName(projectSourcePath, codePath))
       .not.toThrowError();
   });
 });
 
 describe('test projects with wrong package name', () => {
-  const codePath = getFixturePath('wrong');
+  const codePath = getCodePath('wrong');
+  const projectSourcePaths = getProjectSourcePaths('verifiable');
 
-  test.each(verifiableProjects)('%s', (imageName) => {
-    expect(() => checkPackageName(imageName, codePath))
+  test.each(projectSourcePaths)('%s', (projectSourcePath) => {
+    expect(() => checkPackageName(projectSourcePath, codePath))
       .toThrowError(/^Package name should be .+ instead of wrong-package-name$/);
   });
 });
 
 describe('test not verifiable projects', () => {
-  const codePath = getFixturePath('correct');
+  const codePath = getCodePath('correct');
+  const projectSourcePaths = getProjectSourcePaths('not_verifiable');
 
-  test.each(notVerifiableProjects)('%s', (imageName) => {
-    expect(() => checkPackageName(imageName, codePath))
+  test.each(projectSourcePaths)('%s', (projectSourcePath) => {
+    expect(() => checkPackageName(projectSourcePath, codePath))
       .not.toThrowError();
+  });
+});
+
+describe('test incorrect projects without spec', () => {
+  const codePath = getCodePath('correct');
+  const projectSourcePaths = getProjectSourcePaths('incorrect');
+
+  test.each(projectSourcePaths)('%s', (projectSourcePath) => {
+    expect(() => checkPackageName(projectSourcePath, codePath))
+      .toThrowError();
   });
 });
