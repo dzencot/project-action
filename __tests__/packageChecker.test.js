@@ -1,4 +1,4 @@
-const { describe, test, expect, it } = require('@jest/globals');
+const { describe, test, expect } = require('@jest/globals');
 const path = require('path');
 const fs = require('fs');
 
@@ -14,7 +14,7 @@ const getProjectSourcePaths = (dirname) => {
   const projectsPath = getFixturePath('projects_with_spec', dirname);
   return fs
     .readdirSync(projectsPath)
-    .map((dirname) => path.join(projectsPath, dirname));
+    .map((projectDirname) => path.join(projectsPath, projectDirname));
 };
 
 describe('test projects with correct package name', () => {
