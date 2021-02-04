@@ -9,10 +9,7 @@ const core = require('@actions/core');
 const io = require('@actions/io');
 const exec = require('@actions/exec');
 const { HttpClient } = require('@actions/http-client');
-
-// const chalk = require('chalk');
-// const { execSync } = require('child_process');
-// const _ = require('lodash');
+const colors = require('ansi-colors');
 
 const buildRoutes = require('./routes.js');
 const { checkPackageName } = require('./packageChecker.js');
@@ -41,9 +38,7 @@ const uploadArtifacts = async (diffpath) => {
   const artifactName = 'test-results';
   await artifactClient.uploadArtifact(artifactName, filepaths, diffpath);
   // NOTE: Users need notification that screenshots have been generated. Not error.
-  // TODO: This output is not visible from the outside.
-  // It is necessary to make the user see this inscription.
-  core.info('Download snapshots from Artifacts.');
+  core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
 };
 
 const prepareProject = async (options) => {

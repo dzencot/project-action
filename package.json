@@ -26,6 +26,7 @@
     "@actions/github": "^4.0.0",
     "@actions/http-client": "^1.0.9",
     "@actions/io": "^1.0.2",
+    "ansi-colors": "^4.1.1",
     "chalk": "^4.1.0",
     "fastify": "^3.9.2",
     "ini": "^2.0.0",
