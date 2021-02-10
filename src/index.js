@@ -66,8 +66,9 @@ const prepareProject = async (options) => {
   await exec.exec('docker', ['build', '--cache-from', projectImageName, '.'], { ...cmdOptions, cwd: projectSourcePath });
 };
 
-const check = async ({ projectSourcePath, codePath }) => {
-  checkPackageName(projectSourcePath, codePath);
+const check = async ({ projectSourcePath, codePath, projectMember }) => {
+  const sourceLang = projectMember.project.language;
+  checkPackageName(codePath, sourceLang);
   const options = { cwd: projectSourcePath };
   // NOTE: Installing dependencies is part of testing the project.
   await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], options);

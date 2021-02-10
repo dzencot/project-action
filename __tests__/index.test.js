@@ -21,6 +21,7 @@ test('runTests', async () => {
     tests_on: true,
     project: {
       image_name: 'hexlet-project-source-ci',
+      language: 'ruby',
     },
   };
   nock(url.origin)

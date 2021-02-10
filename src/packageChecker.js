@@ -17,11 +17,6 @@ const getFormat = (filepath) => path.extname(filepath).slice(1);
 const parse = (content, format) => parsers[format](content);
 const getData = (filepath) => parse(fs.readFileSync(filepath, 'utf-8'), getFormat(filepath));
 
-const getProjectLanguage = (projectSourcePath) => {
-  const spec = getData(getFullPath(projectSourcePath, 'spec.yml'));
-  return _.get(spec, 'project.language');
-};
-
 const mapping = {
   python: {
     expectedPackageName: 'hexlet-code',
@@ -43,8 +38,7 @@ const mapping = {
   },
 };
 
-const checkPackageName = (projectSourcePath, codePath) => {
-  const sourceLang = getProjectLanguage(projectSourcePath);
+const checkPackageName = (codePath, sourceLang) => {
   const props = mapping[sourceLang];
 
   // NOTE: If the properties for checking the current project
