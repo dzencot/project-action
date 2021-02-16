@@ -3,13 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const ini = require('ini');
-const yaml = require('js-yaml');
-const _ = require('lodash');
+// const yaml = require('js-yaml');
+// const _ = require('lodash');
 
 const parsers = {
   json: JSON.parse,
   toml: ini.parse,
-  yml: yaml.load,
+  // yml: yaml.load,
 };
 
 const getFullPath = (dirpath, filename) => path.resolve(dirpath, filename);
