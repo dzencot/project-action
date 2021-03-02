@@ -41,6 +41,31 @@ const uploadArtifacts = async (diffpath) => {
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
 };
 
+const uploadTestData = async (options) => {
+  const { projectSourcePath, verbose } = options;
+  const archiveName = 'test-data.zip';
+  const testDataDirname = '__artifacts__';
+  const testDataPath = path.join(projectSourcePath, testDataDirname);
+
+  if (!fs.existsSync(testDataPath)) {
+    return;
+  }
+
+  const testDataDir = fs.statSync(testDataPath);
+  if (!testDataDir.isDirectory()) {
+    return;
+  }
+
+  const cmdOptions = { silent: !verbose, cwd: testDataPath };
+  await exec.exec(`zip -r ${archiveName} .`, null, cmdOptions);
+
+  const artifactName = 'test-data';
+  const artifactClient = artifact.create();
+  const archivePath = path.join(testDataPath, archiveName);
+  await artifactClient.uploadArtifact(artifactName, [archivePath], testDataPath);
+  core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
+};
+
 const prepareProject = async (options) => {
   const {
     codePath,
@@ -125,7 +150,8 @@ const finishCheck = async (projectMemberId) => {
 
 // NOTE: Post actions should be performed regardless of the test completion result.
 const runPostActions = async (params) => {
-  const { mountPath, projectMemberId } = params;
+  const { mountPath, projectMemberId, verbose } = params;
+  const projectSourcePath = path.join(mountPath, 'source');
 
   const diffpath = path.join(
     mountPath,
@@ -134,8 +160,14 @@ const runPostActions = async (params) => {
     'artifacts',
   );
 
+  const options = {
+    projectSourcePath,
+    verbose,
+  };
+
   await core.group('Finish check', () => finishCheck(projectMemberId));
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
+  await core.group('Upload test data', () => uploadTestData(options));
 };
 
 module.exports = {
