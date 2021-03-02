@@ -37,3 +37,6 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: test-results
+    - uses: actions/download-artifact@v2
+      with:
+        name: test-data
