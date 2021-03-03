@@ -54,8 +54,8 @@ const uploadTestData = async (options) => {
     return;
   }
 
-  const existPaths = artifacts.filter((artifact) => (
-    fs.existsSync(path.join(projectSourcePath, artifact))
+  const existPaths = artifacts.filter((artifactPath) => (
+    fs.existsSync(path.join(projectSourcePath, artifactPath))
   ));
 
   if (existPaths.length === 0) {
