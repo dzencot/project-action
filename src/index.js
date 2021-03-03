@@ -10,6 +10,7 @@ const io = require('@actions/io');
 const exec = require('@actions/exec');
 const { HttpClient } = require('@actions/http-client');
 const colors = require('ansi-colors');
+const yaml = require('js-yaml');
 
 const buildRoutes = require('./routes.js');
 const { checkPackageName } = require('./packageChecker.js');
@@ -43,26 +44,31 @@ const uploadArtifacts = async (diffpath) => {
 
 const uploadTestData = async (options) => {
   const { projectSourcePath, verbose } = options;
+
+  const specPath = path.join(projectSourcePath, '__data__', 'spec.yml');
+  const specContent = fs.readFileSync(specPath).toString();
+  const specData = yaml.load(specContent);
+  const { artifacts } = specData;
+
+  if (!artifacts) {
+    return;
+  }
+
+  const existPaths = artifacts.filter(fs.existsSync);
+
+  if (existPaths.length === 0) {
+    return;
+  }
+
   const archiveName = 'test-data.zip';
-  const testDataDirname = '__artifacts__';
-  const testDataPath = path.join(projectSourcePath, testDataDirname);
-
-  if (!fs.existsSync(testDataPath)) {
-    return;
-  }
-
-  const testDataDir = fs.statSync(testDataPath);
-  if (!testDataDir.isDirectory()) {
-    return;
-  }
-
-  const cmdOptions = { silent: !verbose, cwd: testDataPath };
-  await exec.exec(`zip -r ${archiveName} .`, null, cmdOptions);
+  const cmdOptions = { silent: !verbose, cwd: projectSourcePath };
+  const command = `zip -r ${archiveName} ${existPaths.join(' ')}`;
+  await exec.exec(command, null, cmdOptions);
 
   const artifactName = 'test-data';
   const artifactClient = artifact.create();
-  const archivePath = path.join(testDataPath, archiveName);
-  await artifactClient.uploadArtifact(artifactName, [archivePath], testDataPath);
+  const archivePath = path.join(projectSourcePath, archiveName);
+  await artifactClient.uploadArtifact(artifactName, [archivePath], projectSourcePath);
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
 };
 
