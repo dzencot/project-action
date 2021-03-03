@@ -10,6 +10,7 @@ const io = require('@actions/io');
 const exec = require('@actions/exec');
 const { HttpClient } = require('@actions/http-client');
 const colors = require('ansi-colors');
+const yaml = require('js-yaml');
 
 const buildRoutes = require('./routes.js');
 const { checkPackageName } = require('./packageChecker.js');
@@ -38,6 +39,38 @@ const uploadArtifacts = async (diffpath) => {
   const artifactName = 'test-results';
   await artifactClient.uploadArtifact(artifactName, filepaths, diffpath);
   // NOTE: Users need notification that screenshots have been generated. Not error.
+  core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
+};
+
+const uploadTestData = async (options) => {
+  const { projectSourcePath, verbose } = options;
+
+  const specPath = path.join(projectSourcePath, '__data__', 'spec.yml');
+  const specContent = fs.readFileSync(specPath).toString();
+  const specData = yaml.load(specContent);
+  const { artifacts } = specData.project;
+
+  if (!artifacts) {
+    return;
+  }
+
+  const existPaths = artifacts.filter((artifactPath) => (
+    fs.existsSync(path.join(projectSourcePath, artifactPath))
+  ));
+
+  if (existPaths.length === 0) {
+    return;
+  }
+
+  const archiveName = 'test-data.zip';
+  const cmdOptions = { silent: !verbose, cwd: projectSourcePath };
+  const command = `zip -r ${archiveName} ${existPaths.join(' ')}`;
+  await exec.exec(command, null, cmdOptions);
+
+  const artifactName = 'test-data';
+  const artifactClient = artifact.create();
+  const archivePath = path.join(projectSourcePath, archiveName);
+  await artifactClient.uploadArtifact(artifactName, [archivePath], projectSourcePath);
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
 };
 
@@ -125,7 +158,8 @@ const finishCheck = async (projectMemberId) => {
 
 // NOTE: Post actions should be performed regardless of the test completion result.
 const runPostActions = async (params) => {
-  const { mountPath, projectMemberId } = params;
+  const { mountPath, projectMemberId, verbose } = params;
+  const projectSourcePath = path.join(mountPath, 'source');
 
   const diffpath = path.join(
     mountPath,
@@ -134,8 +168,14 @@ const runPostActions = async (params) => {
     'artifacts',
   );
 
+  const options = {
+    projectSourcePath,
+    verbose,
+  };
+
   await core.group('Finish check', () => finishCheck(projectMemberId));
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
+  await core.group('Upload test data', () => uploadTestData(options));
 };
 
 module.exports = {
