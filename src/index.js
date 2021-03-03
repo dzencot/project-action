@@ -48,13 +48,15 @@ const uploadTestData = async (options) => {
   const specPath = path.join(projectSourcePath, '__data__', 'spec.yml');
   const specContent = fs.readFileSync(specPath).toString();
   const specData = yaml.load(specContent);
-  const { artifacts } = specData;
+  const { artifacts } = specData.project;
 
   if (!artifacts) {
     return;
   }
 
-  const existPaths = artifacts.filter(fs.existsSync);
+  const existPaths = artifacts.filter((artifact) => (
+    fs.existsSync(path.join(projectSourcePath, artifact))
+  ));
 
   if (existPaths.length === 0) {
     return;
