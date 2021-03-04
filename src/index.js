@@ -46,6 +46,12 @@ const uploadTestData = async (options) => {
   const { projectSourcePath, verbose } = options;
 
   const specPath = path.join(projectSourcePath, '__data__', 'spec.yml');
+
+  // NOTE: The project image is not downloaded until the last step is reached.
+  if (!fs.existsSync(specPath)) {
+    return;
+  }
+
   const specContent = fs.readFileSync(specPath).toString();
   const specData = yaml.load(specContent);
   const { artifacts } = specData.project;
