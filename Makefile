@@ -1,5 +1,4 @@
-setup:
-	echo 'setup';
+setup: install
 
 install:
 	npm install
