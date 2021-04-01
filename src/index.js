@@ -1,6 +1,7 @@
 // @ts-check
 
 // https://github.com/actions/javascript-action
+// https://github.com/actions/toolkit/blob/master/docs/action-debugging.md
 
 const fs = require('fs');
 const path = require('path');
