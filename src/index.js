@@ -92,7 +92,7 @@ const prepareProject = async (options) => {
   } = options;
   const cmdOptions = { silent: !verbose };
 
-  const projectImageName = `hexletprojects/${projectMember.project.image_name}:latest`;
+  const projectImageName = 'dzencot/test-project-ci';
   await io.mkdirP(projectSourcePath);
   const pullCmd = `docker pull ${projectImageName}"`;
   await exec.exec(pullCmd, null, cmdOptions);
