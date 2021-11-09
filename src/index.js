@@ -137,10 +137,10 @@ const runTests = async (params) => {
   core.debug(data);
   const projectMember = JSON.parse(data);
 
-  if (!projectMember.tests_on) {
-    core.warning('Tests will run during review step');
-    return;
-  }
+  // if (!projectMember.tests_on) {
+  //   core.warning('Tests will run during review step');
+  //   return;
+  // }
 
   const options = {
     ...params,
